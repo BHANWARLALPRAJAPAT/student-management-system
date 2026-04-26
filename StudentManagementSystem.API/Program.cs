@@ -14,14 +14,8 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ==========================
-// 🔹 Controllers
-// ==========================
 builder.Services.AddControllers();
 
-// ==========================
-// 🔹 Swagger + JWT Support
-// ==========================
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -57,24 +51,17 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// ==========================
-// 🔹 Database
-// ==========================
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IAppDbContext>(provider =>
     provider.GetRequiredService<AppDbContext>());
 
-// ==========================
-// 🔹 MediatR (CQRS)
-// ==========================
+
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(AssemblyReference).Assembly));
 
-// ==========================
-// 🔹 FluentValidation + Pipeline
-// ==========================
+
 builder.Services.AddValidatorsFromAssembly(typeof(AssemblyReference).Assembly);
 
 builder.Services.AddTransient(
@@ -82,9 +69,7 @@ builder.Services.AddTransient(
     typeof(StudentManagementSystem.Application.Common.Behaviors.ValidationBehavior<,>)
 );
 
-// ==========================
-// 🔹 JWT Settings
-// ==========================
+
 var jwtSection = builder.Configuration.GetSection("JwtSettings");
 builder.Services.Configure<JwtSettings>(jwtSection);
 
@@ -95,9 +80,6 @@ if (jwtSettings is null)
     throw new Exception("JWT Settings are missing in appsettings.json");
 }
 
-// ==========================
-// 🔹 JWT Authentication
-// ==========================
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 .AddJwtBearer(options =>
 {
@@ -114,27 +96,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     };
 });
 
-// ==========================
-// 🔹 Custom Services
-// ==========================
 builder.Services.AddScoped<IJwtService, JwtService>();
 
 var app = builder.Build();
 
-// ==========================
-// 🔹 Global Exception Middleware
-// ==========================
 app.UseMiddleware<ExceptionMiddleware>();
 
-// ==========================
-// 🔹 Swagger
-// ==========================
 app.UseSwagger();
 app.UseSwaggerUI();
 
-// ==========================
-// 🔹 Pipeline
-// ==========================
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
@@ -142,9 +112,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// ==========================
-// 🔹 Database Seeder
-// ==========================
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();

@@ -1,4 +1,3 @@
-// Students/Commands/CreateStudentCommand.cs
 using MediatR;
 public record CreateStudentCommand(
     string Name,

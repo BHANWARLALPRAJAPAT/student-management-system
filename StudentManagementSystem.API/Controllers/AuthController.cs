@@ -2,9 +2,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StudentManagementSystem.Application.Auth.DTOs;
 using StudentManagementSystem.Application.Common.Interfaces;
-using StudentManagementSystem.API.Services;
 using StudentManagementSystem.Domain.Entities;
 using BCrypt.Net;
+using System.Security.Claims;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -25,34 +25,59 @@ public class AuthController : ControllerBase
         var user = await _context.Users
             .FirstOrDefaultAsync(x => x.Email == request.Email);
 
-        if (user == null)
+        if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
         {
-            return Unauthorized(new
-            {
-                statusCode = 401,
-                message = "Invalid email or password"
-            });
+            return Unauthorized(new { message = "Invalid email or password" });
         }
 
-        // verify password
-        bool isValidPassword = BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash);
+        var accessToken = _jwtService.GenerateJwtToken(user);
+        var refreshToken = _jwtService.GenerateRefreshToken();
 
-        if (!isValidPassword)
+        user.RefreshToken = refreshToken;
+        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+
+        await _context.SaveChangesAsync();
+
+        return Ok(new AuthResponse
         {
-            return Unauthorized(new
-            {
-                statusCode = 401,
-                message = "Invalid email or password"
-            });
+            AccessToken = accessToken,
+            RefreshToken = refreshToken,
+            ExpiresIn = 3600
+        });
+    }
+
+    [HttpPost("refresh")]
+    public async Task<IActionResult> Refresh(RefreshTokenRequest request)
+    {
+        var principal = _jwtService.GetPrincipalFromExpiredToken(request.AccessToken);
+
+        if (principal == null)
+            return Unauthorized("Invalid access token");
+
+        var email = principal.FindFirst(ClaimTypes.Email)?.Value;
+
+        var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
+
+        if (user == null ||
+            user.RefreshToken != request.RefreshToken ||
+            user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+        {
+            return Unauthorized("Invalid refresh token");
         }
 
-        var token = _jwtService.GenerateToken(user.Email);
+        var newAccessToken = _jwtService.GenerateJwtToken(user);
+        var newRefreshToken = _jwtService.GenerateRefreshToken();
 
-        return Ok(new
+        user.RefreshToken = newRefreshToken;
+        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+
+        await _context.SaveChangesAsync();
+
+        return Ok(new AuthResponse
         {
-            statusCode = 200,
-            message = "Login successful",
-            result = token
+            AccessToken = newAccessToken,
+            RefreshToken = newRefreshToken,
+            ExpiresIn = 3600
         });
     }
 }
