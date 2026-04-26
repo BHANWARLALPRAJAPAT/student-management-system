@@ -44,5 +44,23 @@ public class AppDbContext : DbContext, IAppDbContext
             entity.HasIndex(e => e.Email)
                   .IsUnique();
         });
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Email)
+                .IsRequired()
+                .HasMaxLength(150);
+
+            entity.Property(e => e.PasswordHash)
+                .IsRequired();
+
+            entity.Property(e => e.RefreshToken)
+                .HasMaxLength(500);
+
+            entity.Property(e => e.RefreshTokenExpiryTime);
+        });
+
+        
     }
 }
