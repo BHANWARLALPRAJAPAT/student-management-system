@@ -2,8 +2,10 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using StudentManagementSystem.Application.Students.DTOs;
 using StudentManagementSystem.Application.Common.Responses;
+using Microsoft.AspNetCore.Authorization;
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class StudentsController : ControllerBase
 {
@@ -13,8 +15,7 @@ public class StudentsController : ControllerBase
     {
         _mediator = mediator;
     }
-
-    // ✅ GET ALL
+[Authorize]
     [HttpGet]
     public async Task<IActionResult> Get()
     {
@@ -25,8 +26,7 @@ public class StudentsController : ControllerBase
             "Students retrieved successfully"
         ));
     }
-
-    // ✅ GET BY ID
+[Authorize]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
@@ -40,6 +40,7 @@ public class StudentsController : ControllerBase
             "Student retrieved successfully"
         ));
     }
+[Authorize]
     [HttpPost]
     public async Task<IActionResult> Create(CreateStudentCommand command)
     {
@@ -51,6 +52,7 @@ public class StudentsController : ControllerBase
             201
         ));
     }
+[Authorize]
     [HttpPut]
     public async Task<IActionResult> Update(UpdateStudentCommand command)
     {
@@ -64,6 +66,7 @@ public class StudentsController : ControllerBase
             "Student updated successfully"
         ));
     }
+[Authorize]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
