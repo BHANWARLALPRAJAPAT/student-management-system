@@ -1,0 +1,51 @@
+# Build results
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider
+.idea/
+*.sln.iml
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+
+# Dotnet
+project.lock.json
+project.fragment.lock.json
+
+# NuGet packages
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+
+# EF Core
+Migrations/*Designer.cs
+Migrations/*.Snapshot.cs
+
+# Publish output
+publish/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Secrets
+appsettings.Development.json
+appsettings.*.local.json
+
+# Node (if any frontend added later)
+node_modules/
+
+# Docker
+**/docker-compose.override.yml
