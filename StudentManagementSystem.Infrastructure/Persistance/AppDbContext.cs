@@ -61,6 +61,6 @@ public class AppDbContext : DbContext, IAppDbContext
             entity.Property(e => e.RefreshTokenExpiryTime);
         });
 
-        
+
     }
 }

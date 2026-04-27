@@ -15,7 +15,7 @@ public class StudentsController : ControllerBase
     {
         _mediator = mediator;
     }
-[Authorize]
+    [Authorize]
     [HttpGet]
     public async Task<IActionResult> Get()
     {
@@ -26,7 +26,7 @@ public class StudentsController : ControllerBase
             "Students retrieved successfully"
         ));
     }
-[Authorize]
+    [Authorize]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
@@ -40,7 +40,7 @@ public class StudentsController : ControllerBase
             "Student retrieved successfully"
         ));
     }
-[Authorize]
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> Create(CreateStudentCommand command)
     {
@@ -52,7 +52,7 @@ public class StudentsController : ControllerBase
             201
         ));
     }
-[Authorize]
+    [Authorize]
     [HttpPut]
     public async Task<IActionResult> Update(UpdateStudentCommand command)
     {
@@ -66,7 +66,7 @@ public class StudentsController : ControllerBase
             "Student updated successfully"
         ));
     }
-[Authorize]
+    [Authorize]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
